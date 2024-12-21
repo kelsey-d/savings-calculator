@@ -2,10 +2,10 @@
 "use client"
 
 import { useState } from 'react';
-import { validateCurrency, validateTargetMonth, validateTargetBalance } from '../../../lib/util.js';
+import { validateCurrency, validateTargetMonth, validateTargetBalance } from '../../lib/util.js';
 
 export default function Page() { //server components have to be asynC?
-    const [estimateType, setEstimateType] = useState("balance");
+    const [estimateType, setEstimateType] = useState("date");
     const [beginningDate, setBeginningDate] = useState("");
     const [beginningBalance, setBeginningBalance] = useState("");
     const [monthlySavings, setMonthlySavings] = useState("");
