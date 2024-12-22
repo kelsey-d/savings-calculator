@@ -83,13 +83,14 @@ export default function Page() { //server components have to be asynC?
             <input id="monthly-savings" type="number" placeholder="$0.00" value={monthlySavings} onChange={(e) => handleMonthlySavings(e)}/>
             <small className={`text-red-700 ${isValidMonthlySavings ? "hidden" : "" }`}>Invalid dollar amount</small>
             <div className="text-white">
-                <button onClick={() =>setEstimateType("date")}>DATE</button>
-                <button onClick={() =>setEstimateType("balance")}>BALANCE</button>
+                <input type="button" value="DATE"onClick={() =>setEstimateType("date")} />
+                <input type="button" value="BALANCE" onClick={() =>setEstimateType("balance")}/>
             </div>
-            <Input type={estimateType} /> {/*Isn't working for some reason */}
+            <Input type={estimateType} />
             
             <button className="border border-white mt-5 w-1/2 text-white"type="submit" disabled>Predict</button>
         </form>
+        
         </div>
     )
 } 
