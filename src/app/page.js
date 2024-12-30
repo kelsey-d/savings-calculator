@@ -9,8 +9,6 @@ export default function Page() { //server components have to be async?
     const [beginningDate, setBeginningDate] = useState("");
     const [beginningBalance, setBeginningBalance] = useState("");
     const [monthlySavings, setMonthlySavings] = useState("");
-    const [targetBalance, setTargetBalance] = useState("");
-    const [targetMonth, setTargetMonth] = useState("");
     const [result, setResult] = useState("");
 
     const [isValidBeginningBalance, setIsValidBeginningBalance] = useState(true);
@@ -35,15 +33,7 @@ export default function Page() { //server components have to be async?
         setIsValidMonthlySavings(validateCurrency(e.target.value));
     }
 
-    function handleTargetBalance(e) {
-        setTargetBalance(e.target.value);
-        setIsValidTargetBalance(validateCurrency(e.target.value) && validateTargetBalance(beginningBalance, e.target.value));
-    }
 
-    function handleTargetMonth(e) {
-        setTargetMonth(e.target.value);
-        setIsValidTargetMonth(validateTargetMonth(beginningDate, e.target.value));
-    }
 
     function handleSubmit() {
         if (estimateType === "date") {
@@ -69,6 +59,18 @@ export default function Page() { //server components have to be async?
     }
     
     function Input({ type }) {
+        const [targetBalance, setTargetBalance] = useState("");
+        const [targetMonth, setTargetMonth] = useState("");
+
+        function handleTargetBalance(e) {
+            setTargetBalance(e.target.value);
+            setIsValidTargetBalance(validateCurrency(e.target.value) && validateTargetBalance(beginningBalance, e.target.value));
+        }
+    
+        function handleTargetMonth(e) {
+            setTargetMonth(e.target.value);
+            setIsValidTargetMonth(validateTargetMonth(beginningDate, e.target.value));
+        }
         switch (type) {
         /*Terrible experience typing input */
             case "date":
@@ -114,7 +116,7 @@ export default function Page() { //server components have to be async?
             </div>
             <Input type={estimateType} />
             
-            <button className="border border-white mt-5 w-1/2 text-white" type="submit" disabled={disableSubmit()}>CALCULATE</button> {/*Ho*/}
+            <button className="border border-white mt-5 w-1/2 text-white" type="submit" disabled={disableSubmit()}>CALCULATE</button>
         </form>)}
 
         {result && (
