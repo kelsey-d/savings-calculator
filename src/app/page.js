@@ -2,15 +2,16 @@
 "use client"
 
 import { useState } from 'react';
-import { validateCurrency, validateTargetMonth, validateTargetBalance } from '../../lib/util.js';
+import { validateCurrency, validateTargetMonth, validateTargetBalance, estimateSavings } from '../../lib/util.js';
 
-export default function Page() { //server components have to be asynC?
+export default function Page() { //server components have to be async?
     const [estimateType, setEstimateType] = useState("date");
     const [beginningDate, setBeginningDate] = useState("");
     const [beginningBalance, setBeginningBalance] = useState("");
     const [monthlySavings, setMonthlySavings] = useState("");
     const [targetBalance, setTargetBalance] = useState("");
     const [targetMonth, setTargetMonth] = useState("");
+    const [result, setResult] = useState("");
 
     const [isValidBeginningBalance, setIsValidBeginningBalance] = useState(true);
     const [isValidMonthlySavings, setIsValidMonthlySavings] = useState(true);
@@ -43,9 +44,33 @@ export default function Page() { //server components have to be asynC?
         setTargetMonth(e.target.value);
         setIsValidTargetMonth(validateTargetMonth(beginningDate, e.target.value));
     }
+
+    function handleSubmit() {
+        if (estimateType === "date") {
+            setResult(estimateSavings(beginningBalance, beginningDate, monthlySavings, estimateType, targetMonth));
+        } else {
+            setResult(estimateSavings(beginningBalance, beginningDate, monthlySavings, estimateType, targetBalance));
+        }
+        setBeginningDate("")
+        setBeginningBalance("");
+        setMonthlySavings("");
+        setEstimateType("date");
+        setTargetMonth("");
+    }
+
+    function disableSubmit() {
+        if (!beginningBalance || !beginningBalance || !monthlySavings) {
+            return true;
+        } else if ((estimateType === "month" && !targetMonth) || (estimateType === "balance" && !targetBalance)){
+            return true;
+        } else {
+            return false;
+        }
+    }
     
     function Input({ type }) {
         switch (type) {
+        /*Terrible experience typing input */
             case "date":
                 return (
                     <>
@@ -71,7 +96,7 @@ export default function Page() { //server components have to be asynC?
         <div className="">
         <h1>Savings Calculator</h1>
         <p><i><b>How to use:</b></i> Select whether you want to project when you'll hit a certain balance or how much you'll hit at a certain date.</p>
-        <form className="flex flex-col w-1/2 text-black">
+        {!result && (<form action={handleSubmit} className="flex flex-col w-1/2 text-black">
             <label htmlFor="beginning-date" className="text-white">Beginning Date: </label>
             <input id="beginning-date" type="date" value={beginningDate} onChange={(e) => handleBeginningDate(e)}/>
 
@@ -82,14 +107,22 @@ export default function Page() { //server components have to be asynC?
             <label htmlFor="monthly-savings" className="text-white">Monthly Savings: </label>
             <input id="monthly-savings" type="number" placeholder="$0.00" value={monthlySavings} onChange={(e) => handleMonthlySavings(e)}/>
             <small className={`text-red-700 ${isValidMonthlySavings ? "hidden" : "" }`}>Invalid dollar amount</small>
-            <div className="text-white">
+            <label htmlFor="mode-toggle" className="text-white">Select a Mode: </label>
+            <div id="mode-toggle" className="text-white">
                 <input type="button" value="DATE"onClick={() =>setEstimateType("date")} />
                 <input type="button" value="BALANCE" onClick={() =>setEstimateType("balance")}/>
             </div>
             <Input type={estimateType} />
             
-            <button className="border border-white mt-5 w-1/2 text-white"type="submit" disabled>Predict</button>
-        </form>
+            <button className="border border-white mt-5 w-1/2 text-white" type="submit" disabled={disableSubmit()}>CALCULATE</button> {/*Ho*/}
+        </form>)}
+
+        {result && (
+            <>
+            <p>{result}</p>
+            <button onClick={() => setResult("")}>RECALCULATE</button>
+            </>
+        )}
         
         </div>
     )
