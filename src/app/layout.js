@@ -1,20 +1,24 @@
 import './globals.css'
 import { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Roboto_Mono, Pixelify_Sans } from 'next/font/google'
 
-const inter = Inter({ subsets: ['latin'] })
+const roboto = Roboto_Mono({ subsets: ['latin'], variable: '--font-roboto' })
+const pixelifySans = Pixelify_Sans({
+  subsets: ['latin'],
+  variable: '--font-pixelify-sans',
+})
 
 export const metadata = {
-  title: 'Savings Estimator',
+  title: 'Savings Calculator',
   description: 'Get ahead on your savings',
 }
 
-export default function RootLayout({
-  children
-}) {
+export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="flex flex-wrap justify-center content-center h-screen">{children}</body>
+    <html lang="en" className={`${pixelifySans.variable} ${roboto.variable}`}>
+      <body className="flex flex-wrap justify-center content-center h-screen">
+        {children}
+      </body>
     </html>
   )
 }

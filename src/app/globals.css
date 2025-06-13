@@ -26,14 +26,26 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.input {
+  @apply bg-[#181C3C] border border-[#947BCB] p-2 rounded-md overflow-hidden w-fit flex items-center gap-x-2;
+}
+
+.font-roboto {
+  font-family: var(--font-roboto), sans-serif;
+}
+
+.font-pixelify-sans {
+  font-family: var(--font-pixelify-sans), sans-serif;
+}
+
 .no-arrows {
-    -moz-appearance: textfield; /* Firefox */
-    -webkit-appearance: none; /* Safari and Chrome */
-    appearance: none; /* Standard */
+  -moz-appearance: textfield; /* Firefox */
+  -webkit-appearance: none; /* Safari and Chrome */
+  appearance: none; /* Standard */
 }
 
 .no-arrows::-webkit-inner-spin-button,
 .no-arrows::-webkit-outer-spin-button {
-    -webkit-appearance: none; /* Remove arrows in Webkit browsers */
-    margin: 0; /* Remove margin */
+  -webkit-appearance: none; /* Remove arrows in Webkit browsers */
+  margin: 0; /* Remove margin */
 }
