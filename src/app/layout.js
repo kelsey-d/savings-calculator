@@ -11,6 +11,7 @@ const pixelifySans = Pixelify_Sans({
 export const metadata = {
   title: 'Savings Calculator',
   description: 'Get ahead on your savings',
+  icon: '/favicon.ico',
 }
 
 export default function RootLayout({ children }) {
@@ -18,6 +19,18 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${pixelifySans.variable} ${roboto.variable}`}>
       <body className="flex flex-wrap justify-center content-center h-screen">
         {children}
+        <footer className="absolute bottom-2 text-xs text-gray-500">
+          <a
+            target="_blank"
+            href="https://icons8.com/icon/cdSipEmaQK9s/money-box"
+          >
+            Piggy Bank
+          </a>{' '}
+          favicon by{' '}
+          <a target="_blank" href="https://icons8.com">
+            Icons8
+          </a>
+        </footer>
       </body>
     </html>
   )
