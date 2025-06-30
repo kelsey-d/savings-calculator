@@ -12,7 +12,7 @@ import { DollarSign, Calendar } from 'lucide-react'
 export default function Page() {
   //server components have to be async?
   const [estimateType, setEstimateType] = useState('date')
-  const [beginningDate, setBeginningDate] = useState('')
+  const [beginningDate, setBeginningDate] = useState()
   const [beginningBalance, setBeginningBalance] = useState('')
   const [monthlySavings, setMonthlySavings] = useState('')
   const [targetBalance, setTargetBalance] = useState('')
@@ -53,10 +53,6 @@ export default function Page() {
       }
     } else if (value.length >= 7 && value.length <= 10) {
       setBeginningDate(value)
-    }
-
-    if (targetMonth) {
-      setIsValidTargetMonth(validateTargetMonth(value, targetMonth))
     }
   }
 
@@ -101,58 +97,62 @@ export default function Page() {
     } else if (value.length >= 3 && value.length <= 7) {
       setTargetMonth(value)
     }
-    setIsValidTargetMonth(validateTargetMonth(beginningDate, value))
+
+    if (value.length === 7) {
+      setIsValidTargetMonth(validateTargetMonth(beginningDate, value))
+    } else {
+      setIsValidTargetMonth(true)
+    }
   }
 
   function handleSubmit() {
-    if (estimateType === 'date') {
-      setResult(
-        estimateSavings(
-          beginningBalance,
-          beginningDate,
-          monthlySavings,
-          estimateType,
-          targetMonth
-        )
+    setResult(
+      estimateSavings(
+        parseInt(beginningBalance),
+        beginningDate,
+        parseInt(monthlySavings) || 0,
+        estimateType,
+        targetMonth,
+        targetBalance
       )
-    } else {
-      setResult(
-        estimateSavings(
-          beginningBalance,
-          beginningDate,
-          monthlySavings,
-          estimateType,
-          targetBalance
-        )
-      )
-    }
+    )
     setBeginningDate('')
     setBeginningBalance('')
     setMonthlySavings('')
     setEstimateType('date')
     setTargetMonth('')
+    setTargetBalance('')
+
+    setIsValidBeginningBalance(true)
+    setIsValidMonthlySavings(true)
+    setIsValidTargetBalance(true)
+    setIsValidTargetMonth(true)
   }
 
   function disableSubmit() {
-    if (!beginningBalance || !beginningBalance || !monthlySavings) {
-      return true
-    } else if (
-      (estimateType === 'month' && !targetMonth) ||
-      (estimateType === 'balance' && !targetBalance)
+    if (
+      !beginningBalance ||
+      !beginningDate ||
+      (estimateType === 'date' && !targetMonth) ||
+      (estimateType === 'balance' && !targetBalance) ||
+      !isValidBeginningBalance ||
+      (monthlySavings && !isValidMonthlySavings) ||
+      !isValidTargetBalance ||
+      !isValidTargetMonth
     ) {
       return true
-    } else {
-      return false
     }
+
+    return false
   }
 
   return (
-    <div className="min-h-screen font-roboto w-full bg-gradient-to-b from-[#403D8E] to-[#181C3C] flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center">
       <h1 className="text-5xl font-black font-pixelify-sans text-shadow-cyan-500/50 text-transparent text-center bg-clip-text bg-gradient-to-b from-[#EDEFD0] to-[#947BCB] uppercase">
         Savings <br />
         Calculator
       </h1>
-      <p className="text-[#EDEFD0] my-4 text-center text-shadow-lg/30">
+      <p className="text-[#EDEFD0] m-6 md:w-3/5 text-center text-shadow-lg/30 text-sm">
         <span className="font-bold">How to use</span>: Select whether you want
         to project when you'll hit a certain balance or how much you'll hit at a
         certain date.
@@ -162,167 +162,148 @@ export default function Page() {
           action={handleSubmit}
           className="flex flex-col justify-center items-center w-full"
         >
-          <div className="flex flex-col md:w-2/5 p-6 rounded-lg shadow-lg bg-[#947BCB]/20 border border-[#947BCB]">
-            <label
-              htmlFor="beginning-date"
-              className="text-[#EDEFD0] uppercase"
-            >
-              Beginning Date:{' '}
-            </label>
-            <div className="input">
-              <Calendar className="size-4" />
-              <input
-                id="beginning-date"
-                type="text"
-                placeholder="mm/dd/yyyy"
-                value={beginningDate}
-                onChange={(e) => handleBeginningDate(e)}
-                className="bg-inherit text-white focus:border-none"
-              />
+          <div className="flex flex-col gap-y-4 md:w-2/5 p-6 rounded-lg shadow-lg bg-[#947BCB]/20 border border-[#947BCB]">
+            <div>
+              <label
+                htmlFor="beginning-date"
+                className="text-[#EDEFD0] uppercase"
+              >
+                Beginning Date:{' '}
+              </label>
+              <div className="input">
+                <Calendar className="size-4" />
+                <input
+                  id="beginning-date"
+                  type="text"
+                  placeholder="mm/dd/yyyy"
+                  value={beginningDate}
+                  onChange={(e) => handleBeginningDate(e)}
+                  className="bg-inherit text-white focus:border-none"
+                />
+              </div>
             </div>
 
-            <label
-              htmlFor="beginning-balance"
-              className="text-[#EDEFD0] uppercase"
-            >
-              Beginning Balance:{' '}
-            </label>
-            <div className="input">
-              <DollarSign className="size-4" />
-              <input
-                id="beginning-balance"
-                type="number"
-                placeholder="0.00"
-                value={beginningBalance}
-                onChange={(e) => handleBeginningBalance(e)}
-                className="bg-inherit text-white no-arrows"
-              />
+            <div>
+              <label
+                htmlFor="beginning-balance"
+                className="text-[#EDEFD0] uppercase"
+              >
+                Beginning Balance:{' '}
+              </label>
+              <div className="input">
+                <DollarSign className="size-4" />
+                <input
+                  id="beginning-balance"
+                  type="number"
+                  placeholder="0.00"
+                  value={beginningBalance}
+                  onChange={(e) => handleBeginningBalance(e)}
+                  className="bg-inherit text-white no-arrows"
+                />
+              </div>
+              <small className={isValidBeginningBalance ? 'hidden' : ''}>
+                Invalid dollar amount
+              </small>
             </div>
-            <small
-              className={`text-red-700 ${
-                isValidBeginningBalance ? 'hidden' : ''
-              }`}
-            >
-              Invalid dollar amount
-            </small>
 
-            <label
-              htmlFor="monthly-savings"
-              className="text-[#EDEFD0] uppercase"
-            >
-              Monthly Savings:
-            </label>
-            <div className="input">
-              <DollarSign className="size-4" />
-              <input
-                id="monthly-savings"
-                type="number"
-                placeholder="0.00"
-                value={monthlySavings}
-                onChange={(e) => handleMonthlySavings(e)}
-                className="bg-inherit text-white no-arrows"
-              />
-            </div>
-            <small
-              className={`text-red-700 ${
-                isValidMonthlySavings ? 'hidden' : ''
-              }`}
-            >
-              Invalid dollar amount
-            </small>
-            <label htmlFor="mode-toggle" className="text-[#EDEFD0] uppercase">
-              Select a Mode:
-            </label>
-            <div id="mode-toggle" className="flex gap-4 mt-2">
-              <button
-                type="button"
-                onClick={() => setEstimateType('date')}
-                className={`px-4 py-2 rounded-md ${
-                  estimateType === 'date'
-                    ? 'bg-gradient-to-b from-[#EEFFD0] to-[#947BCB] text-[#181C3C]'
-                    : 'bg-[#181C3C] text-[#947BCB] border border-[#947BCB]'
-                }`}
+            <div>
+              <label
+                htmlFor="monthly-savings"
+                className="text-[#EDEFD0] uppercase"
               >
-                DATE
-              </button>
-              <button
-                type="button"
-                onClick={() => setEstimateType('balance')}
-                className={`px-4 py-2 rounded-md ${
-                  estimateType === 'balance'
-                    ? 'bg-gradient-to-b from-[#EDEFD0] to-[#947BCB] text-[#181C3C]'
-                    : 'bg-[#181C3C] text-[#947BCB] border border-[#947BCB]'
-                }`}
-              >
-                BALANCE
-              </button>
+                Monthly Savings:
+              </label>
+              <div className="input">
+                <DollarSign className="size-4" />
+                <input
+                  id="monthly-savings"
+                  type="number"
+                  placeholder="0.00"
+                  value={monthlySavings}
+                  onChange={(e) => handleMonthlySavings(e)}
+                  className="bg-inherit text-white no-arrows"
+                />
+              </div>
+              <small className={isValidMonthlySavings ? 'hidden' : ''}>
+                Invalid dollar amount
+              </small>
             </div>
-            {estimateType === 'date' && (
-              <>
-                <label
-                  htmlFor="target-month"
-                  className="text-[#EDEFD0] uppercase"
+
+            <div>
+              <label htmlFor="mode-toggle" className="text-[#EDEFD0] uppercase">
+                Select a Mode:
+              </label>
+              <div id="mode-toggle" className="flex gap-4 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setEstimateType('date')}
+                  data-deselected={estimateType != 'date'}
                 >
-                  Target Month:
-                </label>
-                <div className="input">
-                  <Calendar className="size-4" />
-                  <input
-                    id="target-month"
-                    type="text"
-                    placeholder="mm/yyyy"
-                    value={targetMonth}
-                    onChange={(e) => handleTargetMonth(e)}
-                    className="bg-inherit text-white"
-                  />
-                </div>
-                <small
-                  className={`text-red-700 ${
-                    isValidTargetMonth ? 'hidden' : ''
-                  }`}
+                  DATE
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEstimateType('balance')}
+                  data-deselected={estimateType != 'balance'}
                 >
-                  Target month must be greater than or equal to beginning month.
-                </small>
-              </>
-            )}
-            {estimateType === 'balance' && (
-              <>
-                <label
-                  htmlFor="target-balance"
-                  className="text-[#EDEFD0] uppercase"
-                >
-                  Target Balance:
-                </label>
-                <div className="input">
-                  <DollarSign className="size-4" />
-                  <input
-                    id="target-balance"
-                    type="number"
-                    placeholder="0.00"
-                    value={targetBalance}
-                    onChange={(e) => handleTargetBalance(e)}
-                    className="bg-inherit text-white no-arrows"
-                  />
-                </div>
-                <small
-                  className={`text-red-700 ${
-                    isValidTargetBalance ? 'hidden' : ''
-                  }`}
-                >
-                  Invalid dollar amount
-                </small>
-              </>
-            )}
+                  BALANCE
+                </button>
+              </div>
+            </div>
+
+            <div>
+              {estimateType === 'date' && (
+                <>
+                  <label
+                    htmlFor="target-month"
+                    className="text-[#EDEFD0] uppercase"
+                  >
+                    Target Month:
+                  </label>
+                  <div className="input">
+                    <Calendar className="size-4" />
+                    <input
+                      id="target-month"
+                      type="text"
+                      placeholder="mm/yyyy"
+                      value={targetMonth}
+                      onChange={(e) => handleTargetMonth(e)}
+                      className="bg-inherit text-white"
+                    />
+                  </div>
+                  <small className={isValidTargetMonth ? 'hidden' : ''}>
+                    Target month must be greater than or equal to beginning
+                    month.
+                  </small>
+                </>
+              )}
+              {estimateType === 'balance' && (
+                <>
+                  <label
+                    htmlFor="target-balance"
+                    className="text-[#EDEFD0] uppercase"
+                  >
+                    Target Balance:
+                  </label>
+                  <div className="input">
+                    <DollarSign className="size-4" />
+                    <input
+                      id="target-balance"
+                      type="number"
+                      placeholder="0.00"
+                      value={targetBalance}
+                      onChange={(e) => handleTargetBalance(e)}
+                      className="bg-inherit text-white no-arrows"
+                    />
+                  </div>
+                  <small className={isValidTargetBalance ? 'hidden' : ''}>
+                    Invalid dollar amount
+                  </small>
+                </>
+              )}
+            </div>
           </div>
-          <button
-            className={`mt-5 px-4 py-2 rounded-md shadow-md ${
-              disableSubmit()
-                ? 'text-[#947BCB] border border-[#947BCB]'
-                : 'bg-gradient-to-b from-[#EDEFD0] to-[#947BCB] text-[#181C3C]'
-            }`}
-            type="submit"
-            disabled={disableSubmit()}
-          >
+          <button type="submit" className="mt-5" disabled={disableSubmit()}>
             CALCULATE
           </button>
         </form>
@@ -330,11 +311,8 @@ export default function Page() {
 
       {result && (
         <>
-          <p className="text-[#EDEFD0] mt-4">{result}</p>
-          <button
-            onClick={() => setResult('')}
-            className="mt-4 px-4 py-2 bg-gradient-to-r from-[#EDEFD0] to-[#947BCB] text-[#181C3C] rounded-md shadow-md"
-          >
+          <p className="text-[#EDEFD0] font-bold text-lg">{result}</p>
+          <button className="mt-10" onClick={() => setResult('')}>
             RECALCULATE
           </button>
         </>

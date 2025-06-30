@@ -17,9 +17,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${pixelifySans.variable} ${roboto.variable}`}>
-      <body className="flex flex-wrap justify-center content-center h-screen">
+      <body className="flex flex-col justify-center content-center items-center font-roboto w-full bg-gradient-to-b from-[#403D8E] to-[#181C3C] text-white min-h-screen">
         {children}
-        <footer className="absolute bottom-2 text-xs text-gray-500">
+        <footer className="py-5 bottom-2 text-xs text-gray-500">
           <a
             target="_blank"
             href="https://icons8.com/icon/cdSipEmaQK9s/money-box"
